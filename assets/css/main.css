@@ -2511,8 +2511,45 @@ input[type="radio"]+label:before {
 }
 
 /* Cursor */
+.cursor .cursor--small,
+.cursor .cursor--large,
+.cursor .cursor--text {
+	position: fixed;
+	left: 0;
+	top: 0;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	width: var(--cursor-size);
+	height: var(--cursor-size);
+	mix-blend-mode: difference;
+	pointer-events: none;
+	user-select: none;
+	z-index: 99999;
+}
 
-#main .cursor {
+.cursor .cursor--text {
+	--cursor-size: fit-content;
+	font-size: 0.75rem;
+	color: #fff;
+	opacity: 0;
+}
+
+.cursor .cursor--text .text {
+	font-family: sans-serif;
+	font-weight: bold;
+}
+
+.cursor .cursor--small {
+	--cursor-size: 20px;
+	background: #fff;
+}
+
+.cursor .cursor--large {
+	--cursor-size: 60px;
+	border: 2px solid #fff;
+}
+
+/* #main .cursor {
 
 	pointer-events: none;
 	position: fixed;
@@ -2522,7 +2559,7 @@ input[type="radio"]+label:before {
 	mix-blend-mode: difference;
 	transition: transform 0.3s ease;
 
-}
+} */
 
 /* Table */
 

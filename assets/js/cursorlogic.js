@@ -1,40 +1,159 @@
-function init() {
+
+function main() {
+  console.clear();
 
   if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    //disable cursor
+    // disable cursor
+    console.log('mobile device detected, disabling custom cursor');
     return;
   }
 
-  var $cursorDiv = $("<div/>").addClass("cursor");
-  $("#main").append($cursorDiv);
+  const { gsap, CircleType } = window;
 
-  const link = document.querySelectorAll('nav > .hover-this');
-  const cursor = $cursorDiv;
+  const cursor = $('<div/>').addClass('cursor');
 
-  const animateit = function (e) {
-    const span = this.querySelector('span');
-    const { offsetX: x, offsetY: y } = e,
-      { offsetWidth: width, offsetHeight: height } = this,
+  const cursorOuter = $('<div/>').addClass('cursor--large'); //document.querySelector(".cursor--large");
+  const cursorInner = $('<div/>').addClass('cursor--small'); //document.querySelector(".cursor--small");
+  const cursorTextContainerEl = $('<div/>').addClass('cursor--text');//document.querySelector(".cursor--text");
+  const cursorTextEl = $('<div/>').addClass('text').text('GO HERE! GO HERE! GO HERE! GO HERE!');//cursorTextContainerEl.querySelector(".text");
 
-      move = 25,
-      xMove = x / width * (move * 2) - move,
-      yMove = y / height * (move * 2) - move;
+  $("#main").append(cursor);
+  cursor.append(cursorOuter).append(cursorInner).append(cursorTextContainerEl)
+  cursorTextContainerEl.append(cursorTextEl);
 
-    span.style.transform = `translate(${xMove}px, ${yMove}px)`;
+  const hoverItems = document.querySelectorAll(".cursor-hover-item");
+  const hoverEffectDuration = 0.3;
+  let isHovered = false;
+  let initialCursorHeight;
 
-    if (e.type === 'mouseleave') span.style.transform = '';
+  const cursorRotationDuration = 8;
+
+  let circleType = new CircleType(cursorTextEl[0]);
+  circleType.radius(50);
+
+  setTimeout(() => {
+    initialCursorHeight = circleType.container.style.getPropertyValue("height");
+    console.log(initialCursorHeight);
+  }, 50);
+
+  hoverItems.forEach((item) => {
+    item.addEventListener("pointerenter", handlePointerEnter);
+    item.addEventListener("pointerleave", handlePointerLeave);
+  });
+
+  let mouse = {
+    x: -100,
+    y: -100
   };
 
-  const editCursor = e => {
-    const { clientX: x, clientY: y } = e;
-    cursor.css('left', x + 'px');
-    cursor.css('top', y + 'px');
-  };
+  document.body.addEventListener("pointermove", updateCursorPosition);
 
-  link.forEach(b => b.addEventListener('mousemove', animateit));
-  link.forEach(b => b.addEventListener('mouseleave', animateit));
-  window.addEventListener('mousemove', editCursor);
+  function updateCursorPosition(e) {
+    mouse.x = e.pageX - window.scrollX;
+    mouse.y = e.pageY - window.scrollY;
+  }
 
+  function updateCursor() {
+    gsap.set([cursorInner, cursorTextContainerEl], {
+      x: mouse.x,
+      y: mouse.y
+    });
+
+    gsap.to(cursorOuter, {
+      duration: 0.15,
+      x: mouse.x,
+      y: mouse.y
+    });
+
+    if (!isHovered) {
+      gsap.to(cursorTextContainerEl, hoverEffectDuration * 0.5, {
+        opacity: 0
+      });
+      gsap.set(cursorTextContainerEl, {
+        rotate: 0
+      });
+    }
+
+    requestAnimationFrame(updateCursor);
+  }
+
+  updateCursor();
+
+  function handlePointerEnter(e) {
+    isHovered = true;
+
+    const target = e.currentTarget;
+    updateCursorText(target);
+
+    gsap.set([cursorTextContainerEl, cursorTextEl], {
+      height: initialCursorHeight,
+      width: initialCursorHeight
+    });
+
+    gsap.fromTo(
+      cursorTextContainerEl,
+      {
+        rotate: 0
+      },
+      {
+        duration: cursorRotationDuration,
+        rotate: 360,
+        ease: "none",
+        repeat: -1
+      }
+    );
+
+    gsap.to(cursorInner, hoverEffectDuration, {
+      scale: 2
+    });
+
+    gsap.fromTo(
+      cursorTextContainerEl,
+      hoverEffectDuration,
+      {
+        scale: 1.2,
+        opacity: 0
+      },
+      {
+        delay: hoverEffectDuration * 0.75,
+        scale: 1,
+        opacity: 1
+      }
+    );
+    gsap.to(cursorOuter, hoverEffectDuration, {
+      scale: 1.2,
+      opacity: 0
+    });
+  }
+
+  function handlePointerLeave() {
+    isHovered = false;
+    gsap.to([cursorInner, cursorOuter], hoverEffectDuration, {
+      scale: 1,
+      opacity: 1
+    });
+  }
+
+  function updateCursorText(textEl) {
+    const cursorTextRepeatTimes = textEl.getAttribute("data-cursor-text-repeat");
+    const cursorText = returnMultipleString(
+      textEl.getAttribute("data-cursor-text"),
+      cursorTextRepeatTimes
+    );
+
+    circleType.destroy();
+
+    cursorTextEl.innerHTML = cursorText;
+    circleType = new CircleType(cursorTextEl[0]);
+  }
+
+  function returnMultipleString(string, count) {
+    let s = "";
+    for (let i = 0; i < count; i++) {
+      s += ` ${string} `;
+    }
+    return s;
+  }
 }
 
-$(init)
+$(document).ready(main);
