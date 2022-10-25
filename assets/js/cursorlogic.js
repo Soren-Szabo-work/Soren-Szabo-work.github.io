@@ -1,5 +1,10 @@
 function init() {
 
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    //disable cursor
+    return;
+  }
+
   var $cursorDiv = $("<div/>").addClass("cursor");
   $("#main").append($cursorDiv);
 
