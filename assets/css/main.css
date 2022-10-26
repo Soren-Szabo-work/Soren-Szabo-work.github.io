@@ -2527,7 +2527,7 @@ input[type="radio"]+label:before {
 	z-index: 99999;
 }
 
-.cursor .cursor--text {
+/* .cursor .cursor--text {
 	--cursor-size: fit-content;
 	font-size: 0.75rem;
 	color: #fff;
@@ -2537,16 +2537,28 @@ input[type="radio"]+label:before {
 .cursor .cursor--text .text {
 	font-family: sans-serif;
 	font-weight: bold;
-}
+} */
 
 .cursor .cursor--small {
-	--cursor-size: 20px;
+	--cursor-size: 15px;
 	background: #fff;
 }
 
 .cursor .cursor--large {
-	--cursor-size: 60px;
+	--cursor-size: 45px;
 	border: 2px solid #fff;
+	transition: opacity 0.5 ease-out;
+}
+
+.cursor.cursor--small.cursor--focused {
+	background-image: url("../../images/BANNER_ATHYO.jpg");
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.hidden {
+	opacity: 0;
 }
 
 /* #main .cursor {
