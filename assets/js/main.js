@@ -33,7 +33,11 @@
 
 	// iFrame video player
 
-	// 		YT
+	// Inject YouTube API script
+	var tag = document.createElement('script');
+	tag.src = "https://www.youtube.com/player_api";
+	var firstScriptTag = document.getElementsByTagName('script')[0];
+	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 	// this function gets called when API is ready to use
 	window.onYouTubePlayerAPIReady = function () {
@@ -44,46 +48,32 @@
 
 	function injectVideoPlayer(container) {
 		// create the global player from the specific iframe (#video)
-		let iframe = $(container).find('iframe');
-		let player = new YT.Player(iframe[0].id, {
+		let $placeholder = $(container).find('div');
+		let id = $placeholder[0].id;
+
+		let player = new YT.Player(id, {
+			videoId: id,
 			events: {
 				// call this function when player is ready to use
 				'onReady': function (e) { initVideoEvents(container, player) }
 			}
 		});
-		console.log(player);
 	}
 
 	function initVideoEvents(div, player) {
-		console.log('onready');
 
 		div.addEventListener('click', function () {
-			player.playVideo();
+			if ($(div).hasClass('video--playing')) {
+				$(div).removeClass('video--playing');
+				player.pauseVideo();
+			}
+			else {
+				$(div).addClass('video--playing')
+				player.playVideo();
+			}
 		})
 
-		// // bind events
-		// var playButton = document.getElementById("play-button");
-		// playButton.addEventListener("click", function () {
-		// 	player.playVideo();
-		// });
-
-		// var pauseButton = document.getElementById("pause-button");
-		// pauseButton.addEventListener("click", function () {
-		// 	player.pauseVideo();
-		// });
-
-		// var stopButton = document.getElementById("stop-button");
-		// stopButton.addEventListener("click", function () {
-		// 	player.stopVideo();
-		// });
-
 	}
-
-	// Inject YouTube API script
-	var tag = document.createElement('script');
-	tag.src = "https://www.youtube.com/player_api";
-	var firstScriptTag = document.getElementsByTagName('script')[0];
-	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 	// Forms.
 	var $form = $('form');
