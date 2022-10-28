@@ -53,26 +53,81 @@
 
 		let player = new YT.Player(id, {
 			videoId: id,
+			playerVars: {
+				'origin': window.location.origin,
+				'playlist': id,
+				'loop': 1,
+				'rel': 0,
+				'controls': 0,
+				'modestbranding': 1
+			},
 			events: {
 				// call this function when player is ready to use
-				'onReady': function (e) { initVideoEvents(container, player) }
+				'onReady': function (e) { initVideoEvents(container, player) } // works with e.target (== player)
 			}
 		});
 	}
 
-	function initVideoEvents(div, player) {
+	function initVideoEvents(container, player) {
+		let $c = $(container);
+		let iframe = player.g
 
-		div.addEventListener('click', function () {
-			if ($(div).hasClass('video--playing')) {
-				$(div).removeClass('video--playing');
-				player.pauseVideo();
-			}
-			else {
-				$(div).addClass('video--playing')
-				player.playVideo();
+		$c.on('keydown', function (e) {
+			console.log(e.keyCode + " pressed");
+			switch (e.keyCode) {
+				// F
+				case 70:
+					if (!$(iframe).hasClass('fullscreen')) {
+						let requestFullScreen = iframe.requestFullScreen || iframe.mozRequestFullScreen || iframe.webkitRequestFullScreen;
+						if (requestFullScreen) {
+							requestFullScreen.bind(iframe)();
+							$(iframe).addClass('fullscreen');
+						}
+					}
+					else {
+						let exitFullscreen = document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen;
+						if (exitFullscreen) {
+							exitFullscreen.bind(document)();
+							$(iframe).removeClass('fullscreen');
+						}
+					}
+					break;
+				// K | SPACEBAR
+				case 75: case 32:
+					togglePlayerPlay($c, player);
+					break;
+				// M
+				case 77:
+					togglePlayerMute(player);
+					break;
+				default:
+					break;
 			}
 		})
 
+		container.addEventListener('click', function () {
+			togglePlayerPlay($c, player);
+		})
+	}
+
+	function togglePlayerPlay($container, player) {
+		if ($container.hasClass('video--playing')) {
+			$container.removeClass('video--playing');
+			player.pauseVideo();
+		}
+		else {
+			$container.addClass('video--playing');
+			player.playVideo();
+		}
+	}
+
+	function togglePlayerMute(player) {
+		if (player.isMuted()) {
+			player.unMute();
+		}
+		else {
+			player.mute();
+		}
 	}
 
 	// Forms.
