@@ -74,7 +74,6 @@
 
   // add dark theme class
   function setDarkTheme(e) {
-    console.log(e);
     if (e) document.body.classList.add(darkThemeClass);
     else document.body.classList.remove(darkThemeClass);
     updateThemeIcon(e);
