@@ -102,108 +102,110 @@
   // iFrame video player
 
   // Inject YouTube API script
-  var tag = document.createElement("script");
-  tag.src = "https://www.youtube.com/player_api";
-  var firstScriptTag = document.getElementsByTagName("script")[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  if (!browser.mobile) {
+    var tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/player_api";
+    var firstScriptTag = document.getElementsByTagName("script")[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-  // this function gets called when API is ready to use
-  window.onYouTubePlayerAPIReady = function () {
-    // global variable for the player
-    var $videos = $(".video-container");
-    $videos.each(function () {
-      injectVideoPlayer(this);
-    });
-  };
+    // this function gets called when API is ready to use
+    window.onYouTubePlayerAPIReady = function () {
+      // global variable for the player
+      var $videos = $(".video-container");
+      $videos.each(function () {
+        injectVideoPlayer(this);
+      });
+    };
 
-  function injectVideoPlayer(container) {
-    // create the global player from the specific iframe (#video)
-    let $placeholder = $(container).find("div");
-    let id = $placeholder[0].id;
+    function injectVideoPlayer(container) {
+      // create the global player from the specific iframe (#video)
+      let $placeholder = $(container).find("div");
+      let id = $placeholder[0].id;
 
-    let player = new YT.Player(id, {
-      videoId: id,
-      playerVars: {
-        origin: window.location.origin,
-        playlist: id,
-        loop: 1,
-        rel: 0,
-        controls: 0,
-        modestbranding: 1,
-      },
-      events: {
-        // call this function when player is ready to use
-        onReady: function (e) {
-          initVideoEvents(container, player);
-        }, // works with e.target (== player)
-      },
-    });
-  }
-
-  function initVideoEvents(container, player) {
-    let $c = $(container);
-    let iframe = player.g;
-
-    $c.on("keydown", function (e) {
-      console.log(e.keyCode + " pressed");
-      switch (e.keyCode) {
-        // F
-        case 70:
-          if (!$(iframe).hasClass("fullscreen")) {
-            let requestFullScreen =
-              iframe.requestFullScreen ||
-              iframe.mozRequestFullScreen ||
-              iframe.webkitRequestFullScreen;
-            if (requestFullScreen) {
-              requestFullScreen.bind(iframe)();
-              $(iframe).addClass("fullscreen");
-            }
-          } else {
-            let exitFullscreen =
-              document.exitFullscreen ||
-              document.mozCancelFullScreen ||
-              document.webkitExitFullscreen ||
-              document.msExitFullscreen;
-            if (exitFullscreen) {
-              exitFullscreen.bind(document)();
-              $(iframe).removeClass("fullscreen");
-            }
-          }
-          break;
-        // K | SPACEBAR
-        case 75:
-        case 32:
-          togglePlayerPlay($c, player);
-          break;
-        // M
-        case 77:
-          togglePlayerMute(player);
-          break;
-        default:
-          break;
-      }
-    });
-
-    container.addEventListener("click", function () {
-      togglePlayerPlay($c, player);
-    });
-  }
-
-  function togglePlayerPlay($container, player) {
-    if ($container.hasClass("video--playing")) {
-      $container.removeClass("video--playing");
-      player.pauseVideo();
-    } else {
-      $container.addClass("video--playing");
-      player.playVideo();
+      let player = new YT.Player(id, {
+        videoId: id,
+        playerVars: {
+          origin: window.location.origin,
+          playlist: id,
+          loop: 1,
+          rel: 0,
+          controls: 0,
+          modestbranding: 1,
+        },
+        events: {
+          // call this function when player is ready to use
+          onReady: function (e) {
+            initVideoEvents(container, player);
+          }, // works with e.target (== player)
+        },
+      });
     }
-  }
 
-  function togglePlayerMute(player) {
-    if (player.isMuted()) {
-      player.unMute();
-    } else {
-      player.mute();
+    function initVideoEvents(container, player) {
+      let $c = $(container);
+      let iframe = player.g;
+
+      $c.on("keydown", function (e) {
+        console.log(e.keyCode + " pressed");
+        switch (e.keyCode) {
+          // F
+          case 70:
+            if (!$(iframe).hasClass("fullscreen")) {
+              let requestFullScreen =
+                iframe.requestFullScreen ||
+                iframe.mozRequestFullScreen ||
+                iframe.webkitRequestFullScreen;
+              if (requestFullScreen) {
+                requestFullScreen.bind(iframe)();
+                $(iframe).addClass("fullscreen");
+              }
+            } else {
+              let exitFullscreen =
+                document.exitFullscreen ||
+                document.mozCancelFullScreen ||
+                document.webkitExitFullscreen ||
+                document.msExitFullscreen;
+              if (exitFullscreen) {
+                exitFullscreen.bind(document)();
+                $(iframe).removeClass("fullscreen");
+              }
+            }
+            break;
+          // K | SPACEBAR
+          case 75:
+          case 32:
+            togglePlayerPlay($c, player);
+            break;
+          // M
+          case 77:
+            togglePlayerMute(player);
+            break;
+          default:
+            break;
+        }
+      });
+
+      container.addEventListener("click", function () {
+        togglePlayerPlay($c, player);
+      });
+    }
+
+    function togglePlayerPlay($container, player) {
+      if ($container.hasClass("video--playing")) {
+        $container.removeClass("video--playing");
+        player.pauseVideo();
+      } else {
+        $container.addClass("video--playing");
+        player.playVideo();
+      }
+    }
+
+    function togglePlayerMute(player) {
+      if (player.isMuted()) {
+        player.unMute();
+      } else {
+        player.mute();
+      }
     }
   }
 
