@@ -9,8 +9,8 @@ This project was built to showcase my work since I started my journey as a gamep
 - [x] Dark mode synced across pages
 - [x] Articles about my projects
 - [x] Cursor animations and custom code
-- [] Images and more illustrations
-- [] React version
+- [ ] Images and more illustrations
+- [ ] React version
 
 ##About Phantom by HTML5 UP
 html5up.net | @ajlkn
